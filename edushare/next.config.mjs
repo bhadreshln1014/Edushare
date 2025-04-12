@@ -13,14 +13,20 @@ try {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // ← Most important line (makes it a static site)
-  trailingSlash: true, // ← Fixes Vercel routing
-  images: {
-    unoptimized: true, // ← Required for static exports
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-  // Remove all experimental stuff for stability
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true }
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  images: {
+    unoptimized: true,
+  },
+  experimental: {
+    webpackBuildWorker: true,
+    parallelServerBuildTraces: true,
+    parallelServerCompiles: true,
+  },
 }
 
 if (userConfig) {
