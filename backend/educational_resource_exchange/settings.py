@@ -79,9 +79,31 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    os.environ.get('https://v0-educational-resource-platform.vercel.app', 'http://localhost:3000'),
+    'https://v0-educational-resource-platform.vercel.app',
+    'http://localhost:3000',
+]
+
+# Additional CORS settings
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 # Security Enhancements
