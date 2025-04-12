@@ -1,0 +1,14 @@
+{
+    "name": "dbms-project",
+    "private": true,
+    "workspaces": [
+      "backend",
+      "edushare"
+    ],
+    "scripts": {
+      "dev": "npm run dev -w edushare",
+      "build": "npm run build -w edushare",
+      "backend:dev": "cd backend && python manage.py runserver",
+      "backend:migrate": "cd backend && python manage.py migrate"
+    }
+  }

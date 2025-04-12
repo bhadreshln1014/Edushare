@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+__pycache__/
+*.pyc
+
+# Next.js build output
+edushare/.next/
+edushare/out/
+
+# Django static and media files
+backend/staticfiles/
+backend/mediafiles/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.production.local
+
+# Misc
+.DS_Store
+*.pem
