@@ -69,6 +69,7 @@ DATABASES = {
     )
 }
 
+ROOT_URLCONF = 'educational_resource_exchange.urls'
 # Static files configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -123,3 +124,4 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'resources.User'
+CORS_ALLOW_CREDENTIALS=True
