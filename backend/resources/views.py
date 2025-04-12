@@ -176,7 +176,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
         
         # Return download URL or file content
         return Response({
-            "download_url": request.build_absolute_uri(resource.file.url)
+            "download_url": resource.file.url
         })
     
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
