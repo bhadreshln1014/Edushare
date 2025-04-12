@@ -79,14 +79,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CORS_ALLOW_ALL_ORIGINS = False 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://v0-educational-resource-platform.vercel.app",
-    "https://v0-educational-resource-*.vercel.app",  # also include preview URLs if needed
+    os.environ.get('v0-educational-resource-platform.vercel.app', 'http://localhost:3000'),
 ]
-
 
 # Security Enhancements
 SECURE_SSL_REDIRECT = True
@@ -128,38 +124,4 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'resources.User'
-
-# settings.py
-CORS_ALLOWED_ORIGINS = [
-    "https://v0-educational-resource-platform-*.vercel.app",
-    "https://v0-educational-resource-platform.vercel.app",
-    "http://localhost:3000"
-]
-
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
-
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-
-CORS_EXPOSE_HEADERS = [
-    'content-type',
-    'x-csrftoken'
-]
-
-CORS_ALLOW_CREDENTIALS = True  # If using cookies/sessions
+CORS_ALLOW_CREDENTIALS=True
