@@ -272,7 +272,7 @@ class FriendshipViewSet(viewsets.ModelViewSet):
     API endpoint for friendships
     """
     queryset = Friendship.objects.all()
-    serializer_class = FriendshipSerializer
+    serializer_class = FriendshipSerializera
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):

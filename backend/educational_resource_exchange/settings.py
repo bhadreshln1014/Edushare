@@ -81,8 +81,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    os.environ.get('v0-educational-resource-platform.vercel.app', 'http://localhost:3000'),
+    "http://localhost:3000",
+    "https://v0-educational-resource-platform.vercel.app",
+    "https://v0-educational-resource-platform-8nyieshuy.vercel.app",  # also include preview URLs if needed
+    "https://v0-educational-resource-git-cd2db5-bhadreshs-projects-b7d943db.vercel.app"
 ]
+
 
 # Security Enhancements
 SECURE_SSL_REDIRECT = True
