@@ -174,15 +174,27 @@ class ResourceViewSet(viewsets.ModelViewSet):
         resource.download_count += 1
         resource.save()
         
-        download_url = resource.file.url if resource.file else None
+        # Check the storage backend
+        storage_class = resource.file.storage.__class__.__name__
+        is_cloudinary = 'cloudinary' in resource.file.storage.__class__.__module__.lower()
         
-        # Log for debugging
-        print(f"File URL: {download_url}")
+        # Get the file URL
+        file_url = resource.file.url
         
-        return Response({
-            "download_url": download_url
-        })
-    
+        # For debugging
+        print(f"Storage class: {storage_class}")
+        print(f"Is Cloudinary: {is_cloudinary}")
+        print(f"File URL: {file_url}")
+        
+        # If we're still getting local URLs, try to construct a functional one
+        if file_url.startswith('/media/'):
+            # For existing files, construct backend URL
+            backend_url = f"https://edushare-backend-okqs.onrender.com{file_url}"
+            return Response({"download_url": backend_url})
+        
+        # Otherwise return the URL as provided by the storage backend
+        return Response({"download_url": file_url})
+        
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
         """Rate a resource"""

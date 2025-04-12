@@ -172,3 +172,11 @@ cloudinary.config(
     api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
     secure = True
 )
+
+print("=" * 50)
+print("CLOUDINARY CONFIGURATION CHECK")
+print(f"Cloud Name: {os.environ.get('CLOUDINARY_CLOUD_NAME')}")
+print(f"API Key Present: {'Yes' if os.environ.get('CLOUDINARY_API_KEY') else 'No'}")
+print(f"API Secret Present: {'Yes' if os.environ.get('CLOUDINARY_API_SECRET') else 'No'}")
+print(f"DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
+print("=" * 50)
