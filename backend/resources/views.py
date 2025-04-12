@@ -174,13 +174,13 @@ class ResourceViewSet(viewsets.ModelViewSet):
         resource.download_count += 1
         resource.save()
         
-        url = resource.file.url
-        if not url.startswith("http"):
-            url = f"https://edushare-backend-okqs.onrender.com{url}"
-            
-        # Return download URL or file content
+        download_url = resource.file.url if resource.file else None
+        
+        # Log for debugging
+        print(f"File URL: {download_url}")
+        
         return Response({
-            "download_url": url
+            "download_url": download_url
         })
     
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
