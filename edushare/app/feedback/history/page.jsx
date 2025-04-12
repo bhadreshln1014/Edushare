@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { config } from '../../config'; // Adjust path as needed
+import { config } from '../../../config'; // Adjust path as needed
 
 function StarRating({ rating, size = "md" }) {
   const numericRating = parseFloat(rating) || 0;

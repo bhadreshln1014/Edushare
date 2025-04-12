@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useParams } from 'next/navigation';
-import { config } from '../../config'; // Adjust path as needed
+import { config } from '../../../config'; // Adjust path as needed
 
 function StarRating({ rating, size = "md" }) {
   const numericRating = parseFloat(rating) || 0;

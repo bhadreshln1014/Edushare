@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
-import { config } from '../../config'; // Adjust path as needed
+import { config } from '../../../config'; // Adjust path as needed
 
 function BarChart({ height, label }) {
   return (
