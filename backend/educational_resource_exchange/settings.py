@@ -11,7 +11,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key-for-local-dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+
 
 # Dynamically set allowed hosts
 ALLOWED_HOSTS = [
@@ -173,10 +174,3 @@ cloudinary.config(
     secure = True
 )
 
-print("=" * 50)
-print("CLOUDINARY CONFIGURATION CHECK")
-print(f"Cloud Name: {os.environ.get('CLOUDINARY_CLOUD_NAME')}")
-print(f"API Key Present: {'Yes' if os.environ.get('CLOUDINARY_API_KEY') else 'No'}")
-print(f"API Secret Present: {'Yes' if os.environ.get('CLOUDINARY_API_SECRET') else 'No'}")
-print(f"DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
-print("=" * 50)
