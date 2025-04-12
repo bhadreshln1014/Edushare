@@ -13,7 +13,10 @@ DEBUG = 'RENDER' not in os.environ
 
 # Dynamically set allowed hosts
 ALLOWED_HOSTS = [
-    os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'localhost'),
+    'edushare-backend-okqs.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    os.environ.get('RENDER_EXTERNAL_HOSTNAME', ''),
 ]
 
 # Application definition
@@ -31,6 +34,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_filters',
     'whitenoise.runserver_nostatic',  # Add whitenoise
+    "cloudinary_storage",
+    "cloudinary",
 ]
 
 TEMPLATES = [
@@ -146,4 +151,15 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'resources.User'
-CORS_ALLOW_CREDENTIALS=True
+
+# Near the bottom of the file
+if not DEBUG:  # Production settings
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
