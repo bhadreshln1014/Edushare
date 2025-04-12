@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "cloudinary_storage",
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
@@ -34,7 +35,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_filters',
     'whitenoise.runserver_nostatic',  # Add whitenoise
-    "cloudinary_storage",
     "cloudinary",
 ]
 
