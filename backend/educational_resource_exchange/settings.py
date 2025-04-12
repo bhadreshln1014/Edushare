@@ -80,7 +80,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    os.environ.get('FRONTEND_URL', 'http://localhost:3000'),
+    os.environ.get('v0-educational-resource-platform.vercel.app', 'http://localhost:3000'),
 ]
 
 # Security Enhancements
