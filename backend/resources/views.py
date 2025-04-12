@@ -9,7 +9,7 @@ from .serializers import (
     DownloadSerializer, FriendshipSerializer
 )
 from .permissions import IsOwnerOrFriendIfPrivate, IsOwnerOrReadOnly
-
+from django.conf import settings  # To access settings.DEBUG and Cloudinary config
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -174,26 +174,22 @@ class ResourceViewSet(viewsets.ModelViewSet):
         resource.download_count += 1
         resource.save()
         
-        # Check the storage backend
-        storage_class = resource.file.storage.__class__.__name__
-        is_cloudinary = 'cloudinary' in resource.file.storage.__class__.__module__.lower()
-        
-        # Get the file URL
+        # Get the file URL directly - don't try to rewrite URLs
         file_url = resource.file.url
         
         # For debugging
+        storage_class = resource.file.storage.__class__.__name__
+        is_cloudinary = 'cloudinary' in resource.file.storage.__class__.__module__.lower()
         print(f"Storage class: {storage_class}")
         print(f"Is Cloudinary: {is_cloudinary}")
         print(f"File URL: {file_url}")
         
-        # If we're still getting local URLs, try to construct a functional one
-        if file_url.startswith('/media/'):
-            # For existing files, construct backend URL
-            backend_url = f"https://edushare-backend-okqs.onrender.com{file_url}"
-            return Response({"download_url": backend_url})
-        
-        # Otherwise return the URL as provided by the storage backend
-        return Response({"download_url": file_url})
+        if file_url.startswith('/media/') and not settings.DEBUG:
+            # Try to get the resource name from the URL
+            filename = file_url.split('/')[-1]
+            # Format as Cloudinary URL (this is a simplified example)
+            cloudinary_url = f"https://res.cloudinary.com/{settings.CLOUDINARY_STORAGE['CLOUD_NAME']}/raw/upload/{filename}"
+            return Response({"download_url": cloudinary_url})
         
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
