@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
+import { config } from '../../config'; // Adjust path as needed
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);

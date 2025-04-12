@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { config } from '../../../config'; // Adjust path as needed
 
 export default function UploadResourcePage() {
   const router = useRouter()
@@ -152,7 +153,7 @@ export default function UploadResourcePage() {
         setIsUploading(false)
       })
       
-      xhr.open('POST', 'http://localhost:8000/api/resources/')
+      xhr.open('POST', `${config.apiUrl}/api/resources/`)
       xhr.setRequestHeader('Authorization', `Token ${token}`)
       
       xhr.send(formData)

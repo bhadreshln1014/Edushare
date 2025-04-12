@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useParams } from 'next/navigation';
+import { config } from '../../config'; // Adjust path as needed
 
 function StarRating({ rating, size = "md" }) {
   const numericRating = parseFloat(rating) || 0;
@@ -220,7 +221,7 @@ export default function UserProfilePage() {
       const headers = { Authorization: `Token ${token}` };
 
       try {
-        const userRes = await fetch(`http://localhost:8000/api/users/${profileUserId}/`, { headers });
+        const userRes = await fetch(`${config.apiUrl}/api/users/${profileUserId}/`, { headers });
         
         if (!userRes.ok) {
           throw new Error(`Failed to fetch user: ${userRes.status}`);
@@ -229,13 +230,13 @@ export default function UserProfilePage() {
         const userData = await userRes.json();
         setUser(userData);
         
-        const resourcesRes = await fetch(`http://localhost:8000/api/users/${profileUserId}/resources/`, { headers });
+        const resourcesRes = await fetch(`${config.apiUrl}/api/users/${profileUserId}/resources/`, { headers });
         if (resourcesRes.ok) {
           const resourcesData = await resourcesRes.json();
           setUploadedResources(resourcesData);
         }
         
-        const ratingsRes = await fetch(`http://localhost:8000/api/users/${profileUserId}/ratings/`, { headers });
+        const ratingsRes = await fetch(`${config.apiUrl}/api/users/${profileUserId}/ratings/`, { headers });
         if (ratingsRes.ok) {
           const ratingsData = await ratingsRes.json();
           setRatingsGiven(ratingsData);
@@ -243,7 +244,7 @@ export default function UserProfilePage() {
         
         if (viewingOwnProfile) {
           try {
-            const downloadsRes = await fetch(`http://localhost:8000/api/users/${profileUserId}/downloads/`, { headers });
+            const downloadsRes = await fetch(`${config.apiUrl}/api/users/${profileUserId}/downloads/`, { headers });
             if (downloadsRes.ok) {
               const downloadsData = await downloadsRes.json();
               setDownloadedResources(downloadsData);
@@ -254,7 +255,7 @@ export default function UserProfilePage() {
         }
 
         if (!viewingOwnProfile) {
-          const friendshipsRes = await fetch(`http://localhost:8000/api/friendships/`, { headers });
+          const friendshipsRes = await fetch(`${config.apiUrl}/api/friendships/`, { headers });
           
           if (friendshipsRes.ok) {
             const friendshipsData = await friendshipsRes.json();
@@ -294,7 +295,7 @@ export default function UserProfilePage() {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
@@ -325,7 +326,7 @@ export default function UserProfilePage() {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${friendshipId}/accept/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${friendshipId}/accept/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
@@ -352,7 +353,7 @@ export default function UserProfilePage() {
       throw new Error("Authentication required");
     }
 
-    const response = await fetch(`http://localhost:8000/api/users/${currentUserId}/`, {
+    const response = await fetch(`${config.apiUrl}/api/users/${currentUserId}/`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Token ${token}`,

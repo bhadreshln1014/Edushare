@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
+import { config } from '../../config'; // Adjust path as needed
 
 function BarChart({ height, label }) {
   return (
@@ -68,7 +69,7 @@ export default function RatingsHistoryPage() {
 
     try {
       // Fetch all ratings for the user
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/ratings/`, { headers })
+      const response = await fetch(`${config.apiUrl}/api/users/${userId}/ratings/`, { headers })
 
       if (!response.ok) {
         throw new Error("Failed to fetch ratings")
@@ -235,7 +236,7 @@ export default function RatingsHistoryPage() {
     if (!token) return
     
     try {
-      const response = await fetch(`http://localhost:8000/api/ratings/${ratingId}/`, {
+      const response = await fetch(`${config.apiUrl}/api/ratings/${ratingId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`

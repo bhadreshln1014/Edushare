@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { config } from '../../config'; // Adjust path as needed
 
 export default function ResourcesPage( { defaultTab = "browse"}) {
   const [searchQuery, setSearchQuery] = useState("")
@@ -72,7 +73,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
       }
       
       const queryString = queryParams.toString()
-      const endpoint = `http://localhost:8000/api/resources/${queryString ? `?${queryString}` : ''}`
+      const endpoint = `${config.apiUrl}/api/resources/${queryString ? `?${queryString}` : ''}`
       
       const response = await fetch(endpoint, {
         headers: {
@@ -114,7 +115,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
       const user = JSON.parse(userString)
       const userId = user.id
       
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/resources/`, {
+      const response = await fetch(`${config.apiUrl}/api/users/${userId}/resources/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -150,7 +151,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
       const user = JSON.parse(userString)
       const userId = user.id
       
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/saved_resources/`, {
+      const response = await fetch(`${config.apiUrl}/api/users/${userId}/saved_resources/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -187,7 +188,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
       const user = JSON.parse(userString)
       const userId = user.id
       
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/saved_resources/`, {
+      const response = await fetch(`${config.apiUrl}/api/users/${userId}/saved_resources/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -235,7 +236,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${resourceId}/download/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${resourceId}/download/`, {
         method: 'POST',
         headers: {
           Authorization: `Token ${token}`
@@ -266,7 +267,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${resourceId}/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${resourceId}/`, {
         method: 'DELETE',
         headers: {
           Authorization: `Token ${token}`
@@ -295,7 +296,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${resourceId}/save/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${resourceId}/save/`, {
         method: 'POST',
         headers: {
           Authorization: `Token ${token}`
@@ -329,7 +330,7 @@ export default function ResourcesPage( { defaultTab = "browse"}) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${resourceId}/unsave/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${resourceId}/unsave/`, {
         method: 'POST',
         headers: {
           Authorization: `Token ${token}`

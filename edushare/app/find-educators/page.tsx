@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
+import { config } from '../../config'; // Adjust path as needed
 
 export default function FindEducatorsPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -47,7 +48,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      let endpoint = "http://localhost:8000/api/users/"
+      let endpoint = `${config.apiUrl}/api/users/`
       
       if (searchQuery) {
         endpoint += `?search=${encodeURIComponent(searchQuery)}`
@@ -66,7 +67,7 @@ export default function FindEducatorsPage() {
       const data = await response.json()
       
       // Fetch friendships to determine status
-      const friendshipsResponse = await fetch(`http://localhost:8000/api/friendships/`, {
+      const friendshipsResponse = await fetch(`${config.apiUrl}/api/friendships/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -140,7 +141,7 @@ export default function FindEducatorsPage() {
     try {
       const user = JSON.parse(userString)
       
-      const response = await fetch(`http://localhost:8000/api/users/${user.id}/friends/`, {
+      const response = await fetch(`${config.apiUrl}/api/users/${user.id}/friends/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -153,7 +154,7 @@ export default function FindEducatorsPage() {
       const data = await response.json()
       
       // Get friendship IDs for each connection
-      const friendshipsResponse = await fetch(`http://localhost:8000/api/friendships/`, {
+      const friendshipsResponse = await fetch(`${config.apiUrl}/api/friendships/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -200,7 +201,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      const friendshipsResponse = await fetch(`http://localhost:8000/api/friendships/`, {
+      const friendshipsResponse = await fetch(`${config.apiUrl}/api/friendships/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -223,7 +224,7 @@ export default function FindEducatorsPage() {
       const pendingUsers = []
       
       for (const friendship of pendingSent) {
-        const userResponse = await fetch(`http://localhost:8000/api/users/${friendship.addressee}/`, {
+        const userResponse = await fetch(`${config.apiUrl}/api/users/${friendship.addressee}/`, {
           headers: {
             Authorization: `Token ${token}`
           }
@@ -260,7 +261,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      const friendshipsResponse = await fetch(`http://localhost:8000/api/friendships/`, {
+      const friendshipsResponse = await fetch(`${config.apiUrl}/api/friendships/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -283,7 +284,7 @@ export default function FindEducatorsPage() {
       const pendingUsers = []
       
       for (const friendship of pendingReceived) {
-        const userResponse = await fetch(`http://localhost:8000/api/users/${friendship.requester}/`, {
+        const userResponse = await fetch(`${config.apiUrl}/api/users/${friendship.requester}/`, {
           headers: {
             Authorization: `Token ${token}`
           }
@@ -318,7 +319,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
@@ -360,7 +361,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${friendshipId}/accept/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${friendshipId}/accept/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
@@ -399,7 +400,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${friendshipId}/reject/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${friendshipId}/reject/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
@@ -436,7 +437,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${friendshipId}/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${friendshipId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`
@@ -475,7 +476,7 @@ export default function FindEducatorsPage() {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${friendshipId}/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${friendshipId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`

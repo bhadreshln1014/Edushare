@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { config } from '../../config'; // Adjust path as needed
 
 function StarRating({ rating, size = "md" }) {
   const numericRating = parseFloat(rating) || 0;
@@ -94,7 +95,7 @@ export default function FeedbackHistoryPage() {
 
     try {
       // First, get all resources created by this user
-      const resourcesResponse = await fetch(`http://localhost:8000/api/users/${userId}/resources/`, { headers })
+      const resourcesResponse = await fetch(`${config.apiUrl}/api/users/${userId}/resources/`, { headers })
       
       if (!resourcesResponse.ok) {
         throw new Error("Failed to fetch resources")
@@ -108,7 +109,7 @@ export default function FeedbackHistoryPage() {
       // This approach might be inefficient for users with many resources
       // A better backend would provide an endpoint that returns all ratings for all of a user's resources
       for (const resource of resources) {
-        const ratingsResponse = await fetch(`http://localhost:8000/api/resources/${resource.id}/ratings/`, { headers })
+        const ratingsResponse = await fetch(`${config.apiUrl}/api/resources/${resource.id}/ratings/`, { headers })
         
         if (ratingsResponse.ok) {
           const ratings = await ratingsResponse.json()

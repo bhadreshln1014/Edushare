@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-
+import { config } from '../../config'; // Adjust path as needed
 export default function ConnectionsPage({ defaultTab = "incoming" }) {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -47,7 +47,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
 
       try {
         // Fetch all friendships
-        const friendshipsRes = await fetch('http://localhost:8000/api/friendships/', { 
+        const friendshipsRes = await fetch(`${config.apiUrl}/api/friendships/`, { 
           headers 
         })
 
@@ -73,7 +73,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
           return Promise.all(
             requests.map(async (request) => {
               const targetId = isSent ? request.addressee : request.requester
-              const response = await fetch(`http://localhost:8000/api/users/${targetId}/`, { headers })
+              const response = await fetch(`${config.apiUrl}/api/users/${targetId}/`, { headers })
               
               if (!response.ok) {
                 throw new Error(`Failed to fetch user ${targetId}`)
@@ -100,7 +100,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
             connections.map(async (connection) => {
               // Get the ID of the connected user (not the current user)
               const friendId = connection.requester === userId ? connection.addressee : connection.requester
-              const response = await fetch(`http://localhost:8000/api/users/${friendId}/`, { headers })
+              const response = await fetch(`${config.apiUrl}/api/users/${friendId}/`, { headers })
               
               if (!response.ok) {
                 throw new Error(`Failed to fetch user ${friendId}`)
@@ -150,7 +150,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
     if (!token) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${requestId}/accept/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${requestId}/accept/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
@@ -169,7 +169,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
         const user = JSON.parse(userString)
         const headers = { Authorization: `Token ${token}` }
         
-        const friendshipsRes = await fetch('http://localhost:8000/api/friendships/', { headers })
+        const friendshipsRes = await fetch(`${config.apiUrl}/api/friendships/`, { headers })
         const friendshipsData = await friendshipsRes.json()
         
         const connected = friendshipsData.filter(
@@ -181,7 +181,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
         const connectionsWithDetails = await Promise.all(
           connected.map(async (connection) => {
             const friendId = connection.requester === user.id ? connection.addressee : connection.requester
-            const response = await fetch(`http://localhost:8000/api/users/${friendId}/`, { headers })
+            const response = await fetch(`${config.apiUrl}/api/users/${friendId}/`, { headers })
             const userData = await response.json()
             
             return {
@@ -207,7 +207,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
     if (!token) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${requestId}/reject/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${requestId}/reject/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
@@ -229,7 +229,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
     if (!token) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${requestId}/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${requestId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`
@@ -250,7 +250,7 @@ export default function ConnectionsPage({ defaultTab = "incoming" }) {
     if (!token) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/friendships/${connectionId}/`, {
+      const response = await fetch(`${config.apiUrl}/api/friendships/${connectionId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`

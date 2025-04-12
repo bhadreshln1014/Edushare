@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import ResourcesPage from "../page"
+import { config } from '../../config'; // Adjust path as needed
 
 export default function MyUploadsPage() {
   useEffect(() => {

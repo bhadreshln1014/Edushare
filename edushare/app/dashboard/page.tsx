@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { config } from '../../config'; // Adjust path as needed
 
 function StarRating({ rating, size = "md" }) {
   const numericRating = parseFloat(rating) || 0;
@@ -94,10 +95,10 @@ export default function DashboardPage() {
 
       try {
         const [uploadsRes, downloadsRes, ratingsRes, friendsRes] = await Promise.all([
-          fetch(`http://localhost:8000/api/users/${userId}/resources/`, { headers }),
-          fetch(`http://localhost:8000/api/users/${userId}/downloads/`, { headers }),
-          fetch(`http://localhost:8000/api/users/${userId}/ratings/`, { headers }),
-          fetch(`http://localhost:8000/api/friendships/`, { headers }),
+          fetch(`${config.apiUrl}/api/users/${userId}/resources/`, { headers }),
+          fetch(`${config.apiUrl}/api/users/${userId}/downloads/`, { headers }),
+          fetch(`${config.apiUrl}/api/users/${userId}/ratings/`, { headers }),
+          fetch(`${config.apiUrl}/api/friendships/`, { headers }),
         ]);
 
         if (

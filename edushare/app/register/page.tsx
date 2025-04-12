@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useRouter } from "next/navigation"
 import api from "@/lib/axios"
+import { config } from '../../config'; // Adjust path as needed
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('')

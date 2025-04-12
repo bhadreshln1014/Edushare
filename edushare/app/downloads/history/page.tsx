@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { config } from '../../../config'; // Adjust path as needed
 
 function ClockIcon(props) {
   return (
@@ -88,7 +89,7 @@ export default function DownloadsHistoryPage() {
 
     try {
       // Fetch all downloads for the user
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/downloads/`, { headers })
+      const response = await fetch(`${config.apiUrl}/api/users/${userId}/downloads/`, { headers })
 
       if (!response.ok) {
         throw new Error("Failed to fetch downloads")
@@ -251,7 +252,7 @@ export default function DownloadsHistoryPage() {
     if (!token) return
     
     try {
-      const response = await fetch(`http://localhost:8000/api/downloads/${downloadId}/`, {
+      const response = await fetch(`${config.apiUrl}/api/downloads/${downloadId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`
@@ -284,7 +285,7 @@ export default function DownloadsHistoryPage() {
     
     try {
       // This would need a custom endpoint in your API
-      const response = await fetch(`http://localhost:8000/api/downloads/clear/`, {
+      const response = await fetch(`${config.apiUrl}/api/downloads/clear/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`
@@ -311,7 +312,7 @@ export default function DownloadsHistoryPage() {
     
     try {
       // Call the resource download endpoint
-      const response = await fetch(`http://localhost:8000/api/resources/${resourceId}/download/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${resourceId}/download/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`

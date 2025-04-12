@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { useRouter } from "next/navigation"
+import { config } from '../../../config'; // Adjust path as needed
 
 export default function ResourceDetailPage({ params }) {
   const router = useRouter()
@@ -45,7 +46,7 @@ export default function ResourceDetailPage({ params }) {
     
     try {
       // Fetch resource details
-      const resourceRes = await fetch(`http://localhost:8000/api/resources/${params.id}/`, {
+      const resourceRes = await fetch(`${config.apiUrl}/api/resources/${params.id}/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -69,7 +70,7 @@ export default function ResourceDetailPage({ params }) {
       await checkIfResourceIsSaved()
       
       // Fetch reviews for this resource
-      const reviewsRes = await fetch(`http://localhost:8000/api/resources/${params.id}/ratings/`, {
+      const reviewsRes = await fetch(`${config.apiUrl}/api/resources/${params.id}/ratings/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -98,7 +99,7 @@ export default function ResourceDetailPage({ params }) {
     
     try {
       const user = JSON.parse(userString)
-      const response = await fetch(`http://localhost:8000/api/users/${user.id}/saved_resources/`, {
+      const response = await fetch(`${config.apiUrl}/api/users/${user.id}/saved_resources/`, {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -126,7 +127,7 @@ export default function ResourceDetailPage({ params }) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${params.id}/download/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${params.id}/download/`, {
         method: 'POST',
         headers: {
           Authorization: `Token ${token}`
@@ -157,7 +158,7 @@ export default function ResourceDetailPage({ params }) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${params.id}/save/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${params.id}/save/`, {
         method: 'POST',
         headers: {
           Authorization: `Token ${token}`
@@ -185,7 +186,7 @@ export default function ResourceDetailPage({ params }) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${params.id}/unsave/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${params.id}/unsave/`, {
         method: 'POST',
         headers: {
           Authorization: `Token ${token}`
@@ -217,7 +218,7 @@ export default function ResourceDetailPage({ params }) {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/resources/${params.id}/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${params.id}/`, {
         method: 'DELETE',
         headers: {
           Authorization: `Token ${token}`
@@ -259,7 +260,7 @@ export default function ResourceDetailPage({ params }) {
     
     try {
       // Use the correct endpoint with the proper data format
-      const response = await fetch(`http://localhost:8000/api/resources/${params.id}/rate/`, {
+      const response = await fetch(`${config.apiUrl}/api/resources/${params.id}/rate/`, {
         method: 'POST',
         headers: {
           Authorization: `Token ${token}`,
