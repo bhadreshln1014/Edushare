@@ -10,6 +10,8 @@ from .serializers import (
 )
 from .permissions import IsOwnerOrFriendIfPrivate, IsOwnerOrReadOnly
 from django.conf import settings  # To access settings.DEBUG and Cloudinary config
+import cloudinary.utils
+import os
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -168,24 +170,25 @@ class ResourceViewSet(viewsets.ModelViewSet):
         """Download a resource and track it"""
         resource = self.get_object()
         
-        # Create download record
+        # Record download
         Download.objects.create(user=request.user, resource=resource)
-        
-        # Increment download count
         resource.download_count += 1
         resource.save()
         
-        # Get the file URL
-        file_url = resource.file.url
+        # Get the file name and extract the public ID
+        file_name = resource.file.name
+        print(f"File name: {file_name}")
         
-        # For non-image files, modify the URL to use raw access
-        if not file_url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')):
-            # Replace 'image/upload' with 'raw/upload' in the URL
-            file_url = file_url.replace('image/upload', 'raw/upload')
+        # Create direct download URL using the SDK
+        download_url = cloudinary.utils.cloudinary_url(
+            file_name,
+            resource_type="raw",
+            type="upload",
+            format="",  # Preserve original format
+        )[0]
         
-        print(f"Download URL: {file_url}")
-        
-        return Response({"download_url": file_url})
+        print(f"SDK generated URL: {download_url}")
+        return Response({"download_url": download_url})
         
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
