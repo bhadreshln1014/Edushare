@@ -166,7 +166,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
         )
         
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        resource = serializer.save(user=self.request.user)
+        print(f"FILE URL: {resource.file.url}")  # Check this appears
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def download(self, request, pk=None):
