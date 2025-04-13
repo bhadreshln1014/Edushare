@@ -184,6 +184,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
         print(f"Storage class: {storage_class}")
         print(f"Is Cloudinary: {is_cloudinary}")
         print(f"File URL: {file_url}")
+        print(f"DEBUG: {settings.DEBUG}")
         
         # Just return the URL directly - no need for manual URL construction
         return Response({"download_url": file_url})
