@@ -2,7 +2,6 @@ import os
 import dj_database_url
 from pathlib import Path
 import cloudinary
-import cloudinary.uploader
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,6 +12,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key-for-local-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
+# Add some debugging output to verify settings (remove after troubleshooting)
+print(f"DEBUG mode is: {DEBUG}")
 
 # Dynamically set allowed hosts
 ALLOWED_HOSTS = [
@@ -29,16 +30,16 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    "cloudinary_storage",
+    'cloudinary_storage',  # Must come before django.contrib.staticfiles
     'django.contrib.staticfiles',
+    'cloudinary',  # Must come after django.contrib.staticfiles
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
     'resources',
     'django_extensions',
     'django_filters',
-    'whitenoise.runserver_nostatic',  # Add whitenoise
-    "cloudinary",
+    'whitenoise.runserver_nostatic',
 ]
 
 TEMPLATES = [
@@ -78,14 +79,39 @@ DATABASES = {
 }
 
 ROOT_URLCONF = 'educational_resource_exchange.urls'
+
 # Static files configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files configuration
+# Media files configuration - base settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudinary configuration - always define this
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+}
+
+# Print cloudinary config values for debugging (without secrets)
+print(f"CLOUDINARY_CLOUD_NAME: {os.environ.get('CLOUDINARY_CLOUD_NAME', 'Not set')}")
+print(f"CLOUDINARY_API_KEY set: {'Yes' if os.environ.get('CLOUDINARY_API_KEY') else 'No'}")
+print(f"CLOUDINARY_API_SECRET set: {'Yes' if os.environ.get('CLOUDINARY_API_SECRET') else 'No'}")
+
+# Storage configuration - always use Cloudinary in production
+if not DEBUG:
+    # Use Cloudinary storage in production
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    # Can use Cloudinary for static files too if needed
+    STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+    print("Using Cloudinary storage for media files")
+else:
+    # Local development uses default file storage and whitenoise for static
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Django's default FileSystemStorage will be used for media
+    print("Using default FileSystemStorage for media files")
 
 CORS_ALLOWED_ORIGINS = [
     'https://v0-educational-resource-platform.vercel.app',
@@ -114,13 +140,20 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# Security Enhancements
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# Don't force SSL in development
+if not DEBUG:
+    # Security Enhancements for production only
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    # Disable security redirects locally
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
 # Logging Configuration
 LOGGING = {
@@ -133,7 +166,14 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',
+        'level': 'INFO',  # Changed from WARNING to INFO for more visibility
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
 
@@ -154,23 +194,3 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'resources.User'
-
-# Near the bottom of the file
-if not DEBUG:  # Production settings
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
-    }
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-else:
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-cloudinary.config( 
-    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key = os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
-    secure = True
-)
-

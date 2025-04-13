@@ -174,22 +174,19 @@ class ResourceViewSet(viewsets.ModelViewSet):
         resource.download_count += 1
         resource.save()
         
-        # Get the file URL directly - don't try to rewrite URLs
+        # Get the file URL directly from the storage backend
+        # This will work correctly whether using local storage or Cloudinary
         file_url = resource.file.url
         
-        # For debugging
+        # For debugging (you can keep this temporarily)
         storage_class = resource.file.storage.__class__.__name__
         is_cloudinary = 'cloudinary' in resource.file.storage.__class__.__module__.lower()
         print(f"Storage class: {storage_class}")
         print(f"Is Cloudinary: {is_cloudinary}")
         print(f"File URL: {file_url}")
         
-        if file_url.startswith('/media/') and not settings.DEBUG:
-            # Try to get the resource name from the URL
-            filename = file_url.split('/')[-1]
-            # Format as Cloudinary URL (this is a simplified example)
-            cloudinary_url = f"https://res.cloudinary.com/{settings.CLOUDINARY_STORAGE['CLOUD_NAME']}/raw/upload/{filename}"
-            return Response({"download_url": cloudinary_url})
+        # Just return the URL directly - no need for manual URL construction
+        return Response({"download_url": file_url})
         
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
