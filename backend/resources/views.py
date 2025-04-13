@@ -179,18 +179,12 @@ class ResourceViewSet(viewsets.ModelViewSet):
         original_url = resource.file.url
         print(f"Original URL: {original_url}")
         
-        # Extract the relevant part of the URL
-        # The SDK seems to be adding an extra period at the end
+        # Correctly modify the URL
         if 'cloudinary' in original_url:
-            if '/v1/' in original_url:
-                parts = original_url.split('/v1/')
-                base_url = parts[0]
-                file_path = parts[1]
-                
-                # Create a direct raw URL without using the SDK
-                download_url = f"{base_url}/raw/upload/{file_path}"
-                print(f"Fixed URL: {download_url}")
-                return Response({"download_url": download_url})
+            # Replace 'image/upload' with 'raw/upload'
+            download_url = original_url.replace('image/upload', 'raw/upload')
+            print(f"Fixed URL: {download_url}")
+            return Response({"download_url": download_url})
         
         # Fallback to the original URL
         return Response({"download_url": original_url})
