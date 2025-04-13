@@ -10,7 +10,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key-for-local-dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False').strip() == 'True'
+
 
 # Add some debugging output to verify settings (remove after troubleshooting)
 print(f"DEBUG mode is: {DEBUG}")
