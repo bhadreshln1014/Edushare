@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
 from cloudinary_storage.storage import MediaCloudinaryStorage
+from django.conf import settings  # Make sure to import settings
 
 class User(AbstractUser):
     """Extended user model for the platform"""
