@@ -44,11 +44,15 @@ class Resource(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     
-    # Updated file field to always use Cloudinary in production
-    file = models.FileField(
-        upload_to='resources/',
-        storage=MediaCloudinaryStorage() if not settings.DEBUG else None
-    )
+    # Using a function to determine storage to avoid import issues
+    def get_storage():
+        from django.conf import settings
+        if not settings.DEBUG:
+            return MediaCloudinaryStorage()
+        return None
+    
+    # Updated file field using the function approach
+    file = models.FileField(upload_to='resources/', storage=get_storage())
     
     resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPES)
     subject = models.CharField(max_length=100)

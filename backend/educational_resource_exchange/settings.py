@@ -2,6 +2,8 @@ import os
 import dj_database_url
 from pathlib import Path
 import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -89,11 +91,24 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Cloudinary configuration - always define this
+# First, set up direct Cloudinary configuration - needs to be before CLOUDINARY_STORAGE
+cloudinary.config( 
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key = os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
+    secure = True
+)
+
+# Then configure Django-Cloudinary-Storage
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    'SECURE': True,
+    'MEDIA_TAG': 'django_media',
+    'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
+    'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': [],
+    'PREFIX': 'media/'
 }
 
 # Print cloudinary config values for debugging (without secrets)
@@ -101,18 +116,18 @@ print(f"CLOUDINARY_CLOUD_NAME: {os.environ.get('CLOUDINARY_CLOUD_NAME', 'Not set
 print(f"CLOUDINARY_API_KEY set: {'Yes' if os.environ.get('CLOUDINARY_API_KEY') else 'No'}")
 print(f"CLOUDINARY_API_SECRET set: {'Yes' if os.environ.get('CLOUDINARY_API_SECRET') else 'No'}")
 
-# Storage configuration - always use Cloudinary in production
+# Set default file storage to Cloudinary in production
+# We'll always use Cloudinary in production for more reliability
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+print("Using Cloudinary storage for media files")
+
+# Static files can use different storage based on environment
 if not DEBUG:
-    # Use Cloudinary storage in production
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    # Can use Cloudinary for static files too if needed
+    # Use Cloudinary for static files in production
     STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
-    print("Using Cloudinary storage for media files")
 else:
-    # Local development uses default file storage and whitenoise for static
+    # Use WhiteNoise for static files in development
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    # Django's default FileSystemStorage will be used for media
-    print("Using default FileSystemStorage for media files")
 
 CORS_ALLOWED_ORIGINS = [
     'https://v0-educational-resource-platform.vercel.app',
@@ -173,6 +188,11 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'cloudinary': {  # Add specific logging for Cloudinary
+            'handlers': ['console'],
+            'level': 'DEBUG',
             'propagate': False,
         },
     },
