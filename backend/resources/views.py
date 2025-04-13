@@ -13,6 +13,9 @@ from django.conf import settings  # To access settings.DEBUG and Cloudinary conf
 import cloudinary.utils
 import os
 import cloudinary.uploader
+import logging
+
+logger = logging.getLogger(__name__)
 
 class UserViewSet(viewsets.ModelViewSet):
     """
