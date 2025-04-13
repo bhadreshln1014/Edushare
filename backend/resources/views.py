@@ -173,6 +173,15 @@ class ResourceViewSet(viewsets.ModelViewSet):
     def download(self, request, pk=None):
         """Download a resource and track it"""
         resource = self.get_object()
+        
+        # Create download record
+        Download.objects.create(user=request.user, resource=resource)
+        
+        # Increment download count
+        resource.download_count += 1
+        resource.save()
+        
+        # Return download URL
         return Response({
             'download_url': resource.file.url
         })
