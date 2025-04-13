@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class User(AbstractUser):
     """Extended user model for the platform"""
@@ -41,7 +42,13 @@ class Resource(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resources')
     title = models.CharField(max_length=200)
     description = models.TextField()
-    file = models.FileField(upload_to='resources/')
+    
+    # Updated file field to always use Cloudinary in production
+    file = models.FileField(
+        upload_to='resources/',
+        storage=MediaCloudinaryStorage() if not settings.DEBUG else None
+    )
+    
     resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPES)
     subject = models.CharField(max_length=100)
     grade_level = models.CharField(max_length=50)

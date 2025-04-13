@@ -165,6 +165,9 @@ class ResourceViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def download(self, request, pk=None):
         """Download a resource and track it"""
+        import os
+        from django.conf import settings
+        
         resource = self.get_object()
         
         # Create download record
@@ -174,11 +177,10 @@ class ResourceViewSet(viewsets.ModelViewSet):
         resource.download_count += 1
         resource.save()
         
-        # Get the file URL directly from the storage backend
-        # This will work correctly whether using local storage or Cloudinary
+        # Get the file URL directly
         file_url = resource.file.url
         
-        # For debugging (you can keep this temporarily)
+        # For debugging
         storage_class = resource.file.storage.__class__.__name__
         is_cloudinary = 'cloudinary' in resource.file.storage.__class__.__module__.lower()
         print(f"Storage class: {storage_class}")
@@ -186,7 +188,21 @@ class ResourceViewSet(viewsets.ModelViewSet):
         print(f"File URL: {file_url}")
         print(f"DEBUG: {settings.DEBUG}")
         
-        # Just return the URL directly - no need for manual URL construction
+        # If using FileSystemStorage and URL starts with /media/ in production
+        if storage_class == 'FileSystemStorage' and file_url.startswith('/media/') and not settings.DEBUG:
+            # Get cloud name from environment
+            cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
+            
+            if cloud_name:
+                # Extract just the filename from the path
+                filename = os.path.basename(file_url)
+                
+                # Construct proper Cloudinary URL
+                cloudinary_url = f"https://res.cloudinary.com/{cloud_name}/raw/upload/{filename}"
+                print(f"Returning Cloudinary URL: {cloudinary_url}")
+                return Response({"download_url": cloudinary_url})
+        
+        # Return URL as-is if it's already a Cloudinary URL or we can't transform it
         return Response({"download_url": file_url})
         
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
