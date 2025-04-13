@@ -304,6 +304,13 @@ class FriendshipViewSet(viewsets.ModelViewSet):
             
         serializer.save(requester=self.request.user, status='pending')
     
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Handle PATCH requests correctly with partial=True.
+        """
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
     @action(detail=True, methods=['post'])
     def accept(self, request, pk=None):
         """Accept a friendship request"""
