@@ -12,6 +12,7 @@ from .permissions import IsOwnerOrFriendIfPrivate, IsOwnerOrReadOnly
 from django.conf import settings  # To access settings.DEBUG and Cloudinary config
 import cloudinary.utils
 import os
+import cloudinary.uploader
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -162,7 +163,32 @@ class ResourceViewSet(viewsets.ModelViewSet):
         )
         
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+            resource = serializer.save(user=self.request.user)
+            
+            try:
+                # Log detailed file information
+                logger.info(f"Resource file path: {resource.file.path}")
+                logger.info(f"Resource file URL: {resource.file.url}")
+                logger.info(f"Resource file name: {resource.file.name}")
+                
+                # Attempt explicit Cloudinary upload
+                upload_result = cloudinary.uploader.upload(
+                    resource.file.path, 
+                    resource_type='raw',  # Force raw file type
+                    folder='resources/'
+                )
+                
+                logger.info(f"Cloudinary Upload Result: {upload_result}")
+                
+                # Optionally update the resource with Cloudinary-specific details
+                resource.cloudinary_public_id = upload_result.get('public_id')
+                resource.save()
+            
+            except Exception as e:
+                logger.error(f"Cloudinary upload error: {str(e)}")
+                # Optionally, you might want to delete the resource if upload fails
+                resource.delete()
+                raise
     
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
@@ -170,24 +196,38 @@ class ResourceViewSet(viewsets.ModelViewSet):
         """Download a resource and track it"""
         resource = self.get_object()
         
-        # Record download
-        Download.objects.create(user=request.user, resource=resource)
-        resource.download_count += 1
-        resource.save()
+        try:
+            # Record download
+            Download.objects.create(user=request.user, resource=resource)
+            resource.download_count += 1
+            resource.save()
+            
+            # Get the original file URL
+            original_url = resource.file.url
+            logger.info(f"Original URL: {original_url}")
+            
+            # Generate a download URL using Cloudinary utilities
+            if 'cloudinary' in original_url:
+                # Extract public ID and generate download URL
+                public_id = original_url.split('/')[-1].split('.')[0]
+                download_url = cloudinary.utils.cloudinary_url(
+                    public_id, 
+                    resource_type='raw',
+                    type='upload'
+                )[0]
+                
+                logger.info(f"Generated Download URL: {download_url}")
+                return Response({"download_url": download_url})
+            
+            # Fallback to original URL
+            return Response({"download_url": original_url})
         
-        # Get the original file URL
-        original_url = resource.file.url
-        print(f"Original URL: {original_url}")
-        
-        # Correctly modify the URL
-        if 'cloudinary' in original_url:
-            # Replace 'image/upload' with 'raw/upload'
-            download_url = original_url.replace('image/upload', 'raw/upload')
-            print(f"Fixed URL: {download_url}")
-            return Response({"download_url": download_url})
-        
-        # Fallback to the original URL
-        return Response({"download_url": original_url})
+        except Exception as e:
+            logger.error(f"Download generation error: {str(e)}")
+            return Response(
+                {"detail": "Error generating download URL", "error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
