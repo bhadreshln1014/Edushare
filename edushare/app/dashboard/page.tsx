@@ -67,11 +67,10 @@ function StatCard({ icon, title, value, color, isRating = false }) {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [userData, setUserData] = useState(null);
   const [uploads, setUploads] = useState([]);
   const [downloads, setDownloads] = useState([]);
-  const [feedback, setFeedback] = useState([]);
-  const [rating, setRating] = useState("0.0");
-  const [friends, setFriends] = useState([]);
+  const [ratings, setRatings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pendingReceivedFriends, setPendingReceivedFriends] = useState([]);
@@ -94,7 +93,9 @@ export default function DashboardPage() {
       const headers = { Authorization: `Token ${token}` };
 
       try {
-        const [uploadsRes, downloadsRes, ratingsRes, friendsRes] = await Promise.all([
+        // Fetch user data to get the average_rating directly from the backend
+        const [userRes, uploadsRes, downloadsRes, ratingsRes, friendsRes] = await Promise.all([
+          fetch(`${config.apiUrl}/api/users/${userId}/`, { headers }),
           fetch(`${config.apiUrl}/api/users/${userId}/resources/`, { headers }),
           fetch(`${config.apiUrl}/api/users/${userId}/downloads/`, { headers }),
           fetch(`${config.apiUrl}/api/users/${userId}/ratings/`, { headers }),
@@ -102,6 +103,7 @@ export default function DashboardPage() {
         ]);
 
         if (
+          !userRes.ok ||
           !uploadsRes.ok ||
           !downloadsRes.ok ||
           !ratingsRes.ok ||
@@ -110,10 +112,14 @@ export default function DashboardPage() {
           throw new Error("One or more API calls failed");
         }
 
+        const userDataResponse = await userRes.json();
         const uploadsData = await uploadsRes.json();
         const downloadsData = await downloadsRes.json();
         const ratingsData = await ratingsRes.json();
         const friendsData = await friendsRes.json();
+        
+        // Set user data from backend
+        setUserData(userDataResponse);
         
         // Separate pending requests
         const receivedPendingRequests = friendsData.filter(friendship => 
@@ -131,20 +137,9 @@ export default function DashboardPage() {
 
         setUploads(uploadsData);
         setDownloads(downloadsData);
-        setFeedback(ratingsData);
-        setFriends(acceptedFriends);
+        setRatings(ratingsData);
         setPendingReceivedFriends(receivedPendingRequests);
         setPendingSentFriends(sentPendingRequests);
-
-        const avgRating =
-          ratingsData.length > 0
-            ? (
-                ratingsData.reduce((sum, r) => sum + parseFloat(r.rating), 0) /
-                ratingsData.length
-              ).toFixed(1)
-            : "0.0";
-
-        setRating(avgRating);
       } catch (err) {
         console.error("Dashboard fetch error:", err);
         setError("Failed to load dashboard data.");
@@ -186,7 +181,7 @@ export default function DashboardPage() {
         <StatCard
           icon={<Star className="h-6 w-6 text-amber-500" />}
           title="Average Rating"
-          value={rating}
+          value={userData?.average_rating?.toFixed(2) || "0.0"}
           color="bg-amber-50"
           isRating={true}
         />
@@ -199,7 +194,7 @@ export default function DashboardPage() {
         <StatCard
           icon={<Users className="h-6 w-6 text-purple-600" />}
           title="Educator Connections"
-          value={friends.length}
+          value={userData?.friend_count || 0}
           color="bg-purple-50"
         />
       </div>
@@ -265,7 +260,7 @@ export default function DashboardPage() {
                       <div>
                         <h3 className="font-medium">{upload.title}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Uploaded {upload.created_at?.slice(0, 10)}
+                          Uploaded {new Date(upload.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -276,10 +271,10 @@ export default function DashboardPage() {
                           size="sm" 
                         />
                         <span className="text-sm text-muted-foreground">
-                          ({upload.average_rating.toFixed(2) || 0})
+                          ({parseFloat(upload.average_rating || 0).toFixed(1)})
                         </span>
                       </div>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => router.push(`/resources/edit/${upload.id}`)}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon">
@@ -320,7 +315,7 @@ export default function DashboardPage() {
                       <div>
                         <h3 className="font-medium">{download.resource_title}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Downloaded {download.downloaded_at?.slice(0, 10)}
+                          Downloaded {new Date(download.downloaded_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -343,7 +338,7 @@ export default function DashboardPage() {
               <Button variant="ghost" size="sm">
                 <Star className="h-4 w-4 text-amber-500 mr-1" />
                 <Link
-                  href="/feedback/history"
+                  href="/ratings/history"
                   className="text-sm text-indigo-600 hover:underline"
                 >
                 View all
@@ -351,15 +346,15 @@ export default function DashboardPage() {
               </Button>
             </div>
             <div className="space-y-4">
-              {feedback.length ? (
-                feedback.slice(0, 3).map((fb) => (
-                  <div key={fb.id} className="border-l-2 border-indigo-600 pl-4">
-                    <h3 className="font-medium">{fb.resource_title}</h3>
+              {ratings.length ? (
+                ratings.slice(0, 3).map((rating) => (
+                  <div key={rating.id} className="border-l-2 border-indigo-600 pl-4">
+                    <h3 className="font-medium">{rating.resource_title}</h3>
                     <div className="flex items-center my-1 gap-1">
-                      <StarRating rating={fb.rating} size="sm" />
-                      <p className="text-sm">"{fb.comment}"</p>
+                      <StarRating rating={rating.rating} size="sm" />
+                      <p className="text-sm">"{rating.comment || 'No comment'}"</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">- {fb.author}</p>
+                    <p className="text-sm text-muted-foreground">- {rating.author || 'Anonymous'}</p>
                   </div>
                 ))
               ) : (
