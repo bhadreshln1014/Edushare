@@ -105,10 +105,11 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
     'SECURE': True,
-    'MEDIA_TAG': 'django_media',
-    'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
-    'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': [],
-    'PREFIX': 'media/'
+    'RESOURCE_TYPES': ['image', 'video', 'raw'],
+    'MEDIA_ATTRIBUTE_NAME': 'file',
+    'DEFAULT_RESOURCE_TYPE': 'raw',  # Treat uploads as raw files by default
+    'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid file.',
+    'UNSIGNED': True  # Makes uploads publicly accessible
 }
 
 # Print cloudinary config values for debugging (without secrets)

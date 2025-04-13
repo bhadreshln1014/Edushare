@@ -175,17 +175,16 @@ class ResourceViewSet(viewsets.ModelViewSet):
         resource.download_count += 1
         resource.save()
         
-        # Get the file URL directly - stored URL should be valid for downloaded
+        # Get the file URL
         file_url = resource.file.url
         
-        # For debugging
-        storage_class = resource.file.storage.__class__.__name__
-        is_cloudinary = 'cloudinary' in resource.file.storage.__class__.__module__.lower()
-        print(f"Storage class: {storage_class}")
-        print(f"Is Cloudinary: {is_cloudinary}")
-        print(f"File URL: {file_url}")
+        # For non-image files, modify the URL to use raw access
+        if not file_url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')):
+            # Replace 'image/upload' with 'raw/upload' in the URL
+            file_url = file_url.replace('image/upload', 'raw/upload')
         
-        # Simply return the URL - should now be a Cloudinary URL
+        print(f"Download URL: {file_url}")
+        
         return Response({"download_url": file_url})
         
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
