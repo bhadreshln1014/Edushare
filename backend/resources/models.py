@@ -45,7 +45,7 @@ class Resource(models.Model):
     description = models.TextField()
     
     # Updated file field using the function approach
-    file = models.FileField(upload_to='resources/')
+    file = models.FileField(upload_to='resources/', storage=MediaCloudinaryStorage())
     
     resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPES)
     subject = models.CharField(max_length=100)

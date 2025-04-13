@@ -87,10 +87,6 @@ ROOT_URLCONF = 'educational_resource_exchange.urls'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files configuration - base settings
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # First, set up direct Cloudinary configuration - needs to be before CLOUDINARY_STORAGE
 cloudinary.config( 
     cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
