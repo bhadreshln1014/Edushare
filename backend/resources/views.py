@@ -175,20 +175,25 @@ class ResourceViewSet(viewsets.ModelViewSet):
         resource.download_count += 1
         resource.save()
         
-        # Get the file name and extract the public ID
-        file_name = resource.file.name
-        print(f"File name: {file_name}")
+        # Get the original file URL
+        original_url = resource.file.url
+        print(f"Original URL: {original_url}")
         
-        # Create direct download URL using the SDK
-        download_url = cloudinary.utils.cloudinary_url(
-            file_name,
-            resource_type="raw",
-            type="upload",
-            format="",  # Preserve original format
-        )[0]
+        # Extract the relevant part of the URL
+        # The SDK seems to be adding an extra period at the end
+        if 'cloudinary' in original_url:
+            if '/v1/' in original_url:
+                parts = original_url.split('/v1/')
+                base_url = parts[0]
+                file_path = parts[1]
+                
+                # Create a direct raw URL without using the SDK
+                download_url = f"{base_url}/raw/upload/{file_path}"
+                print(f"Fixed URL: {download_url}")
+                return Response({"download_url": download_url})
         
-        print(f"SDK generated URL: {download_url}")
-        return Response({"download_url": download_url})
+        # Fallback to the original URL
+        return Response({"download_url": original_url})
         
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
