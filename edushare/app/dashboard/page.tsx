@@ -70,7 +70,8 @@ export default function DashboardPage() {
   const [userData, setUserData] = useState(null);
   const [uploads, setUploads] = useState([]);
   const [downloads, setDownloads] = useState([]);
-  const [ratings, setRatings] = useState([]);
+  const [ratingsGiven, setRatingsGiven] = useState([]);
+  const [ratingsReceived, setRatingsReceived] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pendingReceivedFriends, setPendingReceivedFriends] = useState([]);
@@ -93,8 +94,8 @@ export default function DashboardPage() {
       const headers = { Authorization: `Token ${token}` };
 
       try {
-        // Fetch user data to get the average_rating directly from the backend
-        const [userRes, uploadsRes, downloadsRes, ratingsRes, friendsRes] = await Promise.all([
+        // Fetch user data and resources
+        const [userRes, uploadsRes, downloadsRes, ratingsGivenRes, friendsRes] = await Promise.all([
           fetch(`${config.apiUrl}/api/users/${userId}/`, { headers }),
           fetch(`${config.apiUrl}/api/users/${userId}/resources/`, { headers }),
           fetch(`${config.apiUrl}/api/users/${userId}/downloads/`, { headers }),
@@ -106,7 +107,7 @@ export default function DashboardPage() {
           !userRes.ok ||
           !uploadsRes.ok ||
           !downloadsRes.ok ||
-          !ratingsRes.ok ||
+          !ratingsGivenRes.ok ||
           !friendsRes.ok
         ) {
           throw new Error("One or more API calls failed");
@@ -115,11 +116,43 @@ export default function DashboardPage() {
         const userDataResponse = await userRes.json();
         const uploadsData = await uploadsRes.json();
         const downloadsData = await downloadsRes.json();
-        const ratingsData = await ratingsRes.json();
+        const ratingsGivenData = await ratingsGivenRes.json();
         const friendsData = await friendsRes.json();
         
         // Set user data from backend
         setUserData(userDataResponse);
+        setUploads(uploadsData);
+        setDownloads(downloadsData);
+        setRatingsGiven(ratingsGivenData);
+        
+        // Get ratings received on user's resources
+        // We need to fetch ratings for each resource the user has uploaded
+        const allRatingsReceived = [];
+        
+        // Process each resource to get its ratings
+        for (const resource of uploadsData) {
+          try {
+            const ratingsRes = await fetch(`${config.apiUrl}/api/resources/${resource.id}/ratings/`, { headers });
+            
+            if (ratingsRes.ok) {
+              const resourceRatings = await ratingsRes.json();
+              
+              // Add resource title to each rating and add to the collection
+              resourceRatings.forEach(rating => {
+                allRatingsReceived.push({
+                  ...rating,
+                  resource_title: resource.title
+                });
+              });
+            }
+          } catch (error) {
+            console.error(`Error fetching ratings for resource ${resource.id}:`, error);
+          }
+        }
+        
+        // Sort ratings by date (newest first)
+        allRatingsReceived.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        setRatingsReceived(allRatingsReceived);
         
         // Separate pending requests
         const receivedPendingRequests = friendsData.filter(friendship => 
@@ -135,9 +168,6 @@ export default function DashboardPage() {
           friendship.status === 'accepted'
         );
 
-        setUploads(uploadsData);
-        setDownloads(downloadsData);
-        setRatings(ratingsData);
         setPendingReceivedFriends(receivedPendingRequests);
         setPendingSentFriends(sentPendingRequests);
       } catch (err) {
@@ -320,7 +350,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      By {download.author}
+                      By {download.user}
                     </div>
                   </div>
                 ))
@@ -334,11 +364,11 @@ export default function DashboardPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">Recent Feedback</h2>
+              <h2 className="text-lg font-medium">Recent Feedback Received</h2>
               <Button variant="ghost" size="sm">
                 <Star className="h-4 w-4 text-amber-500 mr-1" />
                 <Link
-                  href="/ratings/history"
+                  href="/feedback/received"
                   className="text-sm text-indigo-600 hover:underline"
                 >
                 View all
@@ -346,19 +376,19 @@ export default function DashboardPage() {
               </Button>
             </div>
             <div className="space-y-4">
-              {ratings.length ? (
-                ratings.slice(0, 3).map((rating) => (
+              {ratingsReceived.length ? (
+                ratingsReceived.slice(0, 3).map((rating) => (
                   <div key={rating.id} className="border-l-2 border-indigo-600 pl-4">
                     <h3 className="font-medium">{rating.resource_title}</h3>
                     <div className="flex items-center my-1 gap-1">
                       <StarRating rating={rating.rating} size="sm" />
                       <p className="text-sm">"{rating.comment || 'No comment'}"</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">- {rating.author || 'Anonymous'}</p>
+                    <p className="text-sm text-muted-foreground">From {rating.user || 'Anonymous'}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">No feedback yet.</p>
+                <p className="text-sm text-muted-foreground">No feedback received yet.</p>
               )}
             </div>
           </CardContent>
