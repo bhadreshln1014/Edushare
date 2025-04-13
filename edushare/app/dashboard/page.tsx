@@ -368,7 +368,7 @@ export default function DashboardPage() {
               <Button variant="ghost" size="sm">
                 <Star className="h-4 w-4 text-amber-500 mr-1" />
                 <Link
-                  href="/feedback/received"
+                  href="/feedback/history"
                   className="text-sm text-indigo-600 hover:underline"
                 >
                 View all
